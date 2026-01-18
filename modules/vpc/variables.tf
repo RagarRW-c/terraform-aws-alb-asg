@@ -1,24 +1,24 @@
 variable "vpc_cidr" {
-  type = string
+  type        = string
   description = "CIDR block for vpc"
 }
 
 variable "public_subnets" {
-  type = list(string)
+  type        = list(string)
   description = "CIDRs for public subnet"
 }
 
 variable "private_subnets" {
-  type = list(string)
+  type        = list(string)
   description = "CIDRs for private subnets"
 }
 
 variable "azs" {
-  type = list(string)
+  type        = list(string)
   description = "Availability zones"
 }
 
 variable "tags" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }

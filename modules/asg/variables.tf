@@ -15,22 +15,22 @@ variable "target_group_arn" {
 }
 
 variable "instance_type" {
-  type = string
+  type    = string
   default = "t3.micro"
 }
 
 variable "tags" {
-  type = map(string)
+  type    = map(string)
   default = {}
 }
 
 variable "scale_out_cpu_threshold" {
-  type = number
+  type    = number
   default = 60
 }
 
 variable "scale_in_cpu_threshold" {
-  type = number
+  type    = number
   default = 20
 }
 

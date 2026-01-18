@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "tfstate" {
   bucket = "portfolio-2-tfstate-wr-242046727288-euc1"
 
   tags = {
-    Name = "terraform-state"
+    Name        = "terraform-state"
     Environment = "dev"
   }
 }
@@ -28,8 +28,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_enc" {
 resource "aws_s3_bucket_public_access_block" "bucket_block" {
   bucket = aws_s3_bucket.tfstate.id
 
-  block_public_acls = true
-  block_public_policy = true
-  ignore_public_acls = true
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
   restrict_public_buckets = true
 }

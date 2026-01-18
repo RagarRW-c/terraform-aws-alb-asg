@@ -1,7 +1,7 @@
 resource "aws_vpc" "server" {
-  cidr_block = var.vpc_cidr
+  cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
-  enable_dns_support = true
+  enable_dns_support   = true
 
   tags = merge(var.tags, {
     Name = "portfolio-vpc"
@@ -17,10 +17,10 @@ resource "aws_internet_gateway" "server" {
 }
 
 resource "aws_subnet" "public" {
-  count = length(var.public_subnets)
-  vpc_id = aws_vpc.server.id
-  cidr_block = var.public_subnets[count.index]
-  availability_zone = var.azs[count.index]
+  count                   = length(var.public_subnets)
+  vpc_id                  = aws_vpc.server.id
+  cidr_block              = var.public_subnets[count.index]
+  availability_zone       = var.azs[count.index]
   map_public_ip_on_launch = true
 
   tags = merge(var.tags, {
@@ -31,9 +31,9 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "private" {
-  count = length(var.private_subnets)
-  vpc_id = aws_vpc.server.id
-  cidr_block = var.private_subnets[count.index]
+  count             = length(var.private_subnets)
+  vpc_id            = aws_vpc.server.id
+  cidr_block        = var.private_subnets[count.index]
   availability_zone = var.azs[count.index]
 
   tags = merge(var.tags, {
@@ -56,8 +56,8 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  count = length(aws_subnet.public)
-  subnet_id = aws_subnet.public[count.index].id
+  count          = length(aws_subnet.public)
+  subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 

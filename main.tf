@@ -60,7 +60,7 @@ module "ecr" {
   source = "./modules/ecr"
 
   name = "portfolio-app"
-  
+
   tags = {
     Project = "terraform-docker-asg"
   }

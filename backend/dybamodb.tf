@@ -1,7 +1,7 @@
 resource "aws_dynamodb_table" "terraform_lock" {
-  name = "terraform-lock"
+  name         = "terraform-lock"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "LockID"
+  hash_key     = "LockID"
 
   attribute {
     name = "LockID"
@@ -9,7 +9,7 @@ resource "aws_dynamodb_table" "terraform_lock" {
   }
 
   tags = {
-    Name = "terraform-lock"
+    Name        = "terraform-lock"
     Environment = "dev"
   }
 }
