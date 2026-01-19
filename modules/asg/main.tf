@@ -39,13 +39,34 @@ resource "aws_launch_template" "version_1" {
 
   vpc_security_group_ids = [aws_security_group.ec2.id]
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2.name
+  }
+
   user_data = base64encode(<<-EOF
-    #!/bin/bash
-    dnf install -y nginx
-    systemctl enable nginx
-    echo "<h1>Hello from $(hostname)</h1>" > /usr/share/nginx/html/index.html
-    systemctl start nginx
-  EOF
+#!/bin/bash
+#!/bin/bash
+set -xe
+
+dnf update -y
+dnf install -y docker awscli
+
+systemctl enable docker
+systemctl start docker
+
+aws ecr get-login-password --region eu-central-1 \
+| docker login --username AWS --password-stdin 242046727288.dkr.ecr.eu-central-1.amazonaws.com
+
+docker pull 242046727288.dkr.ecr.eu-central-1.amazonaws.com/portfolio-app:latest
+
+docker run -d -p 80:80 \
+  --name portfolio-app \
+  242046727288.dkr.ecr.eu-central-1.amazonaws.com/portfolio-app:latest
+EOF
   )
 
   tag_specifications {
@@ -82,4 +103,59 @@ resource "aws_autoscaling_group" "asg_version_1" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_autoscaling_policy" "scale_out" {
+  name                   = "cpu-scale-out"
+  autoscaling_group_name = aws_autoscaling_group.asg_version_1.name
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = 1
+  cooldown               = 300
+}
+
+resource "aws_autoscaling_policy" "scale_in" {
+  name                   = "cpu-scale-in"
+  autoscaling_group_name = aws_autoscaling_group.asg_version_1.name
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = -1
+  cooldown               = 300
+}
+
+
+resource "aws_cloudwatch_metric_alarm" "cpu_high" {
+  alarm_name          = "cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 120
+  statistic           = "Average"
+  threshold           = var.scale_out_cpu_threshold
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.asg_version_1.name
+  }
+
+  alarm_actions = [aws_autoscaling_policy.scale_out.arn]
+
+  tags = var.tags
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu_low" {
+  alarm_name          = "cpu-low"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 120
+  statistic           = "Average"
+  threshold           = var.scale_in_cpu_threshold
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.asg_version_1.name
+  }
+
+  alarm_actions = [aws_autoscaling_policy.scale_in.arn]
+
+  tags = var.tags
 }

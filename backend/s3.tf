@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "tfstate" {
-  bucket = "portfolio-2-tfstate-wr-242046727288-euc1"
+  bucket        = "portfolio-2-tfstate-wr-242046727288-euc1"
+  force_destroy = true
 
   tags = {
     Name        = "terraform-state"

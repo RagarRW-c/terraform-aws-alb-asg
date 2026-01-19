@@ -9,3 +9,11 @@ output "alb_security_group_id" {
 output "target_group_arn" {
   value = aws_lb_target_group.alb_tg.arn
 }
+
+output "alb_arn" {
+  value = aws_lb.web_alb.arn
+}
+
+output "alb_arn_suffix" {
+  value = aws_lb.web_alb.arn_suffix
+}

@@ -65,3 +65,14 @@ module "ecr" {
     Project = "terraform-docker-asg"
   }
 }
+
+
+module "waf" {
+  source = "./modules/waf"
+}
+
+#waf asso
+resource "aws_wafv2_web_acl_association" "alb" {
+  resource_arn = module.alb.alb_arn
+  web_acl_arn  = module.waf.web_acl_arn
+}
